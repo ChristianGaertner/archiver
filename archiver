@@ -1,0 +1,14 @@
+#!/bin/sh
+
+set -e
+
+./rip-chrome-history --file $1 |
+./filter-bytime | # only fetch the last month of history
+./filter-urls | # remove unwanted urls
+./fetch | # the actual download of the websites
+./filter-timestamping | # remove stuff which should not be timestamped (images, css, etc.)
+./timestamp_rfc3161 # timestamp the downloaded files
+
+
+>&2 echo "Removing files bigger than 4M"
+./clean

@@ -1,0 +1,15 @@
+#!/bin/sh
+set -e
+
+cat /dev/stdin |
+sed -e "s/#.*//" |
+sed -e "s/\/$//" |
+grep -v 'irccloud.com' |
+grep -v 'reddit.com' |
+grep -v 'google.de' |
+grep -v 'google.com' |
+grep -v 'archive.org' |
+grep -v 'bitly.com' |
+grep -v 'youtube.com' |
+grep -v "localhost:" |
+grep -v "127.0.0.1"

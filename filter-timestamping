@@ -1,0 +1,15 @@
+#!/bin/sh
+set -e
+
+# We do not want to timestamp asset files.
+
+cat /dev/stdin |
+sed -e "s/#.*//" |
+sed -e "s/\/$//" |
+grep -v '.png$' |
+grep -v '.jpg$' |
+grep -v '.jpeg$' |
+grep -v '.gif$' |
+grep -v '.ico$' |
+grep -v '.css$' |
+grep -v ".js$"

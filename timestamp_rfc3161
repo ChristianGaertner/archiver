@@ -1,0 +1,23 @@
+#!/bin/bash
+set -e
+
+SERVER="http://tsa.starfieldtech.com"
+
+INPUT=$(cat -)
+
+for TARGET in $INPUT; do
+
+	>&2 echo "Timestamping $TARGET"
+
+	TSR="${TARGET}.tsr"
+
+	# remove old TSR file, if it exists
+	rm -f $TSR
+
+	# create the timestamp request
+	openssl ts -query -data $TARGET -sha1 -cert |
+	curl -o $TSR -sSH 'Content-Type: application/timestamp-query' --data-binary @- $SERVER
+
+	# verify result
+	openssl ts -verify -data $TARGET -in $TSR -CApath "$(openssl version -d | cut -d '"' -f 2)/certs/"
+done

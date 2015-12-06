@@ -1,0 +1,24 @@
+#!/bin/sh
+set -e
+
+# we do not want to archive websites,
+# which have been last visited more than a month ago.
+
+MICROSECOND=1000000
+
+# one month
+THRESHOLD=$((30 * 24 * 60 * 60 * $MICROSECOND))
+
+CURRENT_TS=$(date +%s)
+
+TS_THR=$(($CURRENT_TS - $THRESHOLD))
+
+while read line; do
+	TS=$(echo $line | cut -f1 -d'|')
+	# convert chrome timestamp to epoch (unix) timestamp
+	TS=$(($TS/$MICROSECOND-11644473600))
+
+	if [ $TS -gt $TS_THR ] ; then
+		echo ${line#*|} # print only the url part
+	fi
+done

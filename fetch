@@ -1,0 +1,24 @@
+#!/bin/sh
+
+set -e
+
+WORKERS=8
+DATA_DIR=data/
+ESCAPED_DATA_DIR=$(echo $DATA_DIR | sed -e "s/\//\\\\\//")
+
+cd $DATA_DIR
+
+
+>&2 echo "Starting fetch with $WORKERS Workers, storing to '$DATA_DIR'"
+
+# input will be either the given argument, or "-" which will force 'cat' to print the contents of stdin
+[ $# -ge 1 -a -f "$1" ] && input="$1" || input="-"
+cat $input |
+xargs -n 1 -P $WORKERS \
+wget --adjust-extension=off --unlink --continue --page-requisites --timestamping \
+--reject .iso,.exe,.gz,.xz,.rar,.7z,.tar,.bin,.zip,.jar,.flv,.mp4,.avi,.webm,.pdf \
+--user-agent "Mozilla/5.0 (X11; CrOS x86_64 7390.68.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.82 Safari/537.36" 2>&1 |
+grep "Saving to" | sed -e 's/Saving to: ‘//' | tr -d '’' | # extract the new file names
+sed -e "s/^/$ESCAPED_DATA_DIR/" # prepend DATA_DIR
+
+>&2 echo "Fetch completed"
